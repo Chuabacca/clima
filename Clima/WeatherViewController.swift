@@ -7,17 +7,20 @@
 //
 
 import UIKit
+import CoreLocation
 
 
-class WeatherViewController: UIViewController {
+class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     //Constants
-    let WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
-    let APP_ID = "e72ca729af228beabd5d20e3b7749713"
-    
+    var cityParam = ""
+    let weatherApi = "http://api.wunderground.com/api/32a6a9aecbf0859b/conditions/q/cupertino.json"
+
 
     //TODO: Declare instance variables here
-    
+    //This creates a new object from the location manager class
+    let locationManager = CLLocationManager()
+    let geocoder = CLGeocoder()
 
     
     //Pre-linked IBOutlets
@@ -29,9 +32,13 @@ class WeatherViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
         //TODO:Set up the location manager here.
-    
+
+        //This decalres that the WeatherViewController is the delegate of the CLLocationManager
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyThreeKilometers
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.startUpdatingLocation()
         
         
     }
@@ -42,6 +49,10 @@ class WeatherViewController: UIViewController {
     /***************************************************************/
     
     //Write the getWeatherData method here:
+
+    func setWeatherAPICall(cityParam: String) -> String {
+        return "http://api.wunderground.com/api/32a6a9aecbf0859b/conditions/q/\(cityParam).json"
+    }
     
 
     
@@ -76,11 +87,42 @@ class WeatherViewController: UIViewController {
     
     //Write the didUpdateLocations method here:
     
-    
-    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let location = locations[locations.count - 1]
+        if location.horizontalAccuracy > 0 {
+            locationManager.stopUpdatingLocation()
+
+            print("longitude = \(location.coordinate.longitude), latitude = \(location.coordinate.latitude)")
+//            let lat = location.coordinate.latitude
+//            let lon = location.coordinate.longitude
+
+            geocoder.reverseGeocodeLocation(location) { (placemark, error) in
+                if placemark != nil {
+                    let placemarkString = String(describing: placemark![0])
+                    let placemarkArray = placemarkString.components(separatedBy: ", ")
+                    let cityName = placemarkArray[2]
+                    self.cityParam = cityName.components(separatedBy: " ")[0] + "_" + cityName.components(separatedBy: " ")[1]
+                    print(self.cityParam)
+                }
+                else {
+                    print(error!)
+                    return
+                }
+
+            }
+
+
+        }
+
+    }
+
+
     //Write the didFailWithError method here:
     
-    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print(error)
+        cityLabel.text = "Location Unavailable"
+    }
     
 
     
