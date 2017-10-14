@@ -4,4 +4,5 @@ use_frameworks!
 
 target 'Clima' do
     pod 'Alamofire', '~> 4.5'
+    pod 'SVProgressHUD'
 end
