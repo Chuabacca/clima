@@ -14,6 +14,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     //Constants
     var cityParam = ""
+    var stateParam = ""
     let weatherApi = "http://api.wunderground.com/api/32a6a9aecbf0859b/conditions/q/cupertino.json"
 
 
@@ -50,8 +51,8 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     //Write the getWeatherData method here:
 
-    func setWeatherAPICall(cityParam: String) -> String {
-        return "http://api.wunderground.com/api/32a6a9aecbf0859b/conditions/q/\(cityParam).json"
+    func setWeatherAPICall() -> String {
+        return "http://api.wunderground.com/api/32a6a9aecbf0859b/conditions/q/\(stateParam)/\(cityParam).json"
     }
     
 
@@ -92,9 +93,9 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
         if location.horizontalAccuracy > 0 {
             locationManager.stopUpdatingLocation()
 
+            //Debug
             print("longitude = \(location.coordinate.longitude), latitude = \(location.coordinate.latitude)")
-//            let lat = location.coordinate.latitude
-//            let lon = location.coordinate.longitude
+
 
             geocoder.reverseGeocodeLocation(location) { (placemark, error) in
                 if placemark != nil {
@@ -102,7 +103,14 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
                     let placemarkArray = placemarkString.components(separatedBy: ", ")
                     let cityName = placemarkArray[2]
                     self.cityParam = cityName.components(separatedBy: " ")[0] + "_" + cityName.components(separatedBy: " ")[1]
+                    let state = placemarkArray[3]
+                    self.stateParam = state.components(separatedBy: " ")[0]
+
+                    //Debug
                     print(self.cityParam)
+                    print(self.stateParam)
+                    print(self.setWeatherAPICall())
+
                 }
                 else {
                     print(error!)
