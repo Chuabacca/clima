@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreLocation
+import Alamofire
 
 
 class WeatherViewController: UIViewController, CLLocationManagerDelegate {
@@ -15,8 +16,6 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     //Constants
     var cityParam = ""
     var stateParam = ""
-    let weatherApi = "http://api.wunderground.com/api/32a6a9aecbf0859b/conditions/q/cupertino.json"
-
 
     //TODO: Declare instance variables here
     //This creates a new object from the location manager class
@@ -51,10 +50,27 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     //Write the getWeatherData method here:
 
-    func setWeatherAPICall() -> String {
-        return "http://api.wunderground.com/api/32a6a9aecbf0859b/conditions/q/\(stateParam)/\(cityParam).json"
+    func callAPI() {
+        let url = "http://api.wunderground.com/api/32a6a9aecbf0859b/conditions/q/\(stateParam)/\(cityParam).json"
+        print(url)
+        Alamofire.request(url).responseJSON { response in
+            guard response.result.isSuccess else {
+                return
+            }
+            //Debug
+            print(response.result.value!)
+            do {
+                let decoder = JSONDecoder()
+                let resp = try decoder.decode(WeatherData.self, from: response.data!)
+                //Debug
+                print("Temp: \(resp.currentObservation.tempF) F")
+            }
+            catch {
+                print("Error: \(error)")
+            }
+        }
+
     }
-    
 
     
     
@@ -63,7 +79,20 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     //MARK: - JSON Parsing
     /***************************************************************/
-   
+
+    struct WeatherData: Codable {
+        struct CurrentObservation: Codable {
+            let tempF: Double
+            enum CodingKeys: String, CodingKey {
+                case tempF = "temp_f"
+            }
+        }
+
+        let currentObservation: CurrentObservation
+        enum CodingKeys: String, CodingKey {
+            case currentObservation = "current_observation"
+        }
+    }
     
     //Write the updateWeatherData method here:
     
@@ -105,11 +134,11 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
                     self.cityParam = cityName.components(separatedBy: " ")[0] + "_" + cityName.components(separatedBy: " ")[1]
                     let state = placemarkArray[3]
                     self.stateParam = state.components(separatedBy: " ")[0]
+                    self.callAPI()
 
                     //Debug
                     print(self.cityParam)
                     print(self.stateParam)
-                    print(self.setWeatherAPICall())
 
                 }
                 else {
