@@ -172,8 +172,10 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     
     //Write the userEnteredANewCityName Delegate method here:
 
-    func userEnteredANewCityName(city: String) {
-        <#code#>
+    func userEnteredANewCityName(location: [String]) {
+
+
+
     }
     
     //Write the PrepareForSegue Method here

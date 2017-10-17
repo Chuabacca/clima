@@ -11,7 +11,7 @@ import UIKit
 
 //Write the protocol declaration here:
 protocol ChangeCityDelegate {
-    func userEnteredANewCityName(city: String)
+    func userEnteredANewCityName(location: [String])
 }
 
 class ChangeCityViewController: UIViewController {
@@ -29,11 +29,14 @@ class ChangeCityViewController: UIViewController {
         
         
         //1 Get the city name the user entered in the text field
-        let cityName = changeCityTextField.text!
-        
-        
+        let locationArray = changeCityTextField.text!.components(separatedBy: ", ")
+        guard locationArray.count == 2 else {
+            changeCityTextField.text = "Please enter a city and state."
+            return
+        }
+
         //2 If we have a delegate set, call the method userEnteredANewCityName
-        delegate?.userEnteredANewCityName(city: cityName)
+        delegate?.userEnteredANewCityName(location: locationArray)
         
         //3 dismiss the Change City View Controller to go back to the WeatherViewController
         self.dismiss(animated: true, completion: nil)
