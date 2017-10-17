@@ -11,8 +11,12 @@ import UIKit
 class WeatherDataModel {
 
     //Declare your model variables here
-    
-    
+
+    var cityName = "Loading..."
+    var temp: Double = 0
+    var cityParam = ""
+    var stateParam = ""
+
     //This method turns a condition code into the name of the weather condition image
     
 //    func updateWeatherIcon(condition: Int) -> String {

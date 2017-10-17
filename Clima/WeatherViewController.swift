@@ -14,13 +14,12 @@ import Alamofire
 class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate {
     
     //Constants
-    var cityParam = ""
-    var stateParam = ""
 
     //TODO: Declare instance variables here
     //This creates a new object from the location manager class
     let locationManager = CLLocationManager()
     let geocoder = CLGeocoder()
+    let weatherData = WeatherDataModel()
 
     
     //Pre-linked IBOutlets
@@ -51,7 +50,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     //Write the getWeatherData method here:
 
     func callAPI() {
-        let url = "http://api.wunderground.com/api/32a6a9aecbf0859b/conditions/q/\(stateParam)/\(cityParam).json"
+        let url = "http://api.wunderground.com/api/32a6a9aecbf0859b/conditions/q/\(weatherData.stateParam)/\(weatherData.cityParam).json"
         print(url)
         Alamofire.request(url).responseJSON { response in
             guard response.result.isSuccess else {
@@ -64,7 +63,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
                 let resp = try decoder.decode(WeatherData.self, from: response.data!)
                 //Debug
                 print("Temp: \(resp.currentObservation.tempF) F")
-                self.temp = resp.currentObservation.tempF
+                self.weatherData.temp = resp.currentObservation.tempF
                 self.updateUIWithWeatherData()
             }
             catch {
@@ -109,8 +108,8 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     //Write the updateUIWithWeatherData method here:
     
     func updateUIWithWeatherData() {
-        temperatureLabel.text = "\(Int(temp))°"
-        cityLabel.text = cityName
+        temperatureLabel.text = "\(Int(weatherData.temp))°"
+        cityLabel.text = weatherData.cityName
     }
     
     
@@ -135,15 +134,15 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
                 if placemark != nil {
                     let placemarkString = String(describing: placemark![0])
                     let placemarkArray = placemarkString.components(separatedBy: ", ")
-                    self.cityName = placemarkArray[2]
-                    self.cityParam = self.cityName.components(separatedBy: " ")[0] + "_" + self.cityName.components(separatedBy: " ")[1]
+                    self.weatherData.cityName = placemarkArray[2]
+                    self.weatherData.cityParam = self.weatherData.cityName.components(separatedBy: " ")[0] + "_" + self.weatherData.cityName.components(separatedBy: " ")[1]
                     let state = placemarkArray[3]
-                    self.stateParam = state.components(separatedBy: " ")[0]
+                    self.weatherData.stateParam = state.components(separatedBy: " ")[0]
                     self.callAPI()
 
                     //Debug
-                    print(self.cityParam)
-                    print(self.stateParam)
+                    print(self.weatherData.cityParam)
+                    print(self.weatherData.stateParam)
 
                 }
                 else {
