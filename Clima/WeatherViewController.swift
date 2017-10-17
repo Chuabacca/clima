@@ -135,9 +135,8 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
                     let placemarkString = String(describing: placemark![0])
                     let placemarkArray = placemarkString.components(separatedBy: ", ")
                     self.weatherData.cityName = placemarkArray[2]
-                    self.weatherData.cityParam = self.weatherData.cityName.components(separatedBy: " ")[0] + "_" + self.weatherData.cityName.components(separatedBy: " ")[1]
-                    let state = placemarkArray[3]
-                    self.weatherData.stateParam = state.components(separatedBy: " ")[0]
+                    self.weatherData.createCityParam()
+                    self.weatherData.createStateParam(state: placemarkArray[3])
                     self.callAPI()
 
                     //Debug

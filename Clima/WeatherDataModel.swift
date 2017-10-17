@@ -17,6 +17,20 @@ class WeatherDataModel {
     var cityParam = ""
     var stateParam = ""
 
+    func createCityParam() {
+        let words = cityName.components(separatedBy: NSCharacterSet.whitespaces)
+        for word in words {
+            cityParam += word
+            if words.count >= 1 {
+                cityParam += "_"
+            }
+        }
+    }
+
+    func createStateParam(state: String) {
+        stateParam = state.components(separatedBy: NSCharacterSet.whitespaces)[0]
+    }
+
     //This method turns a condition code into the name of the weather condition image
     
 //    func updateWeatherIcon(condition: Int) -> String {
