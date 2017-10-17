@@ -11,7 +11,7 @@ import CoreLocation
 import Alamofire
 
 
-class WeatherViewController: UIViewController, CLLocationManagerDelegate {
+class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate {
     
     //Constants
     var cityParam = ""
@@ -64,6 +64,8 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
                 let resp = try decoder.decode(WeatherData.self, from: response.data!)
                 //Debug
                 print("Temp: \(resp.currentObservation.tempF) F")
+                self.temp = resp.currentObservation.tempF
+                self.updateUIWithWeatherData()
             }
             catch {
                 print("Error: \(error)")
@@ -106,7 +108,10 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     //Write the updateUIWithWeatherData method here:
     
-    
+    func updateUIWithWeatherData() {
+        temperatureLabel.text = "\(Int(temp))°"
+        cityLabel.text = cityName
+    }
     
     
     
@@ -130,8 +135,8 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
                 if placemark != nil {
                     let placemarkString = String(describing: placemark![0])
                     let placemarkArray = placemarkString.components(separatedBy: ", ")
-                    let cityName = placemarkArray[2]
-                    self.cityParam = cityName.components(separatedBy: " ")[0] + "_" + cityName.components(separatedBy: " ")[1]
+                    self.cityName = placemarkArray[2]
+                    self.cityParam = self.cityName.components(separatedBy: " ")[0] + "_" + self.cityName.components(separatedBy: " ")[1]
                     let state = placemarkArray[3]
                     self.stateParam = state.components(separatedBy: " ")[0]
                     self.callAPI()
@@ -168,14 +173,17 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate {
     
     
     //Write the userEnteredANewCityName Delegate method here:
-    
 
+    func userEnteredANewCityName(city: String) {
+        <#code#>
+    }
     
     //Write the PrepareForSegue Method here
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "changeCityName" {
             let destinationVC = segue.destination as! ChangeCityViewController
+            destinationVC.delegate = self
         }
     }
     
